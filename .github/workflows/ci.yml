@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: healthsense-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repo-integrity:
+    name: Repo integrity
+    runs-on: windows-latest
+    timeout-minutes: 35
+
+    env:
+      PYTHONUTF8: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      HEALTHSENSE_CI: "1"
+      HEALTHSENSE_SKIP_FULL_WESAD: "1"
+      HEALTHSENSE_SKIP_GPU: "1"
+      CUDA_VISIBLE_DEVICES: ""
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install package and CI tools
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          if (Test-Path -LiteralPath "requirements-dev.txt") {
+            python -m pip install -r requirements-dev.txt
+          } elseif (Test-Path -LiteralPath "constraints-dev.txt") {
+            python -m pip install -c constraints-dev.txt ruff pytest build tabulate
+          } else {
+            python -m pip install ruff pytest build tabulate
+          }
+          python -m pip install -e .
+
+      - name: CI scope guard
+        shell: pwsh
+        run: |
+          python scripts/ci_scope_guard.py
+
+      - name: Ruff format check
+        shell: pwsh
+        run: |
+          python -m ruff format --check src tests scripts
+
+      - name: Ruff lint
+        shell: pwsh
+        run: |
+          python -m ruff check src tests scripts
+
+      - name: Python compile check
+        shell: pwsh
+        run: |
+          python -m compileall -q src tests scripts
+
+      - name: Unit and smoke tests
+        shell: pwsh
+        run: |
+          if (Test-Path -LiteralPath "tests") {
+            python -m pytest tests -q -m "not gpu and not cuda and not wesad and not slow and not integration"
+          } else {
+            Write-Output "No tests directory found; skipping pytest."
+          }
+
+      - name: Build package
+        shell: pwsh
+        run: |
+          python -m build

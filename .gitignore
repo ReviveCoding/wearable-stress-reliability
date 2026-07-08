@@ -1,0 +1,34 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+test-results/
+dist/
+*.py[cod]
+outputs/
+data/raw/
+data/processed/
+*.pkl
+*.pt
+*.joblib
+build/
+*.egg-info/
+
+# Local run and editor files
+.local-run/
+.vscode/
+.DS_Store
+# HealthSense-RCP local evidence artifacts
+*.npz
+*.pth
+*.pickle
+
+# Local backups and generated workflow backups
+*.before_*
+*.bak_*
+.github/workflows/*.bak_*
+
+# Python build outputs
+.mypy_cache/

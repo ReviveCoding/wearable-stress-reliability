@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "healthsense-rcp"
+version = "0.6.2"
+description = "Non-clinical, participant-disjoint wearable sensing reliability evaluation lab."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = { text = "MIT" }
+authors = [{name = "Jinwoo Bae"}]
+dependencies = [
+  "numpy>=2.0,<3",
+  "pandas>=2.2,<3",
+  "scikit-learn>=1.5,<2",
+  "matplotlib>=3.8,<4",
+  "PyYAML>=6.0,<7",
+  "joblib>=1.4,<2",
+  "torch>=2.6,<2.12",
+  "threadpoolctl>=3.5,<4",
+  "tabulate>=0.9,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2,<2",
+  "pytest>=8,<10",
+  "pytest-cov>=5,<8",
+  "ruff>=0.11,<1",
+]
+parquet = ["pyarrow>=16,<30"]
+
+[project.scripts]
+healthsense = "healthsense.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"healthsense.resources" = ["*.yaml"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q --strict-config --strict-markers"
+junit_suite_name = "healthsense-rcp"
+
+[tool.coverage.run]
+branch = true
+source = ["healthsense"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

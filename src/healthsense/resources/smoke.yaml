@@ -1,0 +1,43 @@
+run:
+  seed: 17
+  run_id: smoke
+  output_root: outputs
+  deterministic: true
+
+data:
+  window_seconds: 30
+  hop_seconds: 5
+  n_subjects: 7
+  windows_per_subject: 18
+  sequence_length: 16
+  n_modalities: 4
+  n_channels: 8
+  final_holdout_subjects: 2
+  calibration_subjects: 1
+models:
+  c1_max_iter: 80
+  c2_epochs: 1
+  c3_epochs: 1
+  batch_size: 32
+  learning_rate: 0.003
+  hidden_dim: 16
+  dropout: 0.1
+  # CI/smoke deliberately stays on CPU. Set to cuda in a copied real-data config.
+  device: cpu
+evaluation:
+  threshold_grid: [0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85]
+  target_false_alert_minutes_per_hour: 8.0
+  ece_bins: 10
+  bootstrap_resamples: 200
+  release_gates:
+    min_episode_recall_uplift_pp: 3.0
+    min_bootstrap_subjects: 5
+    max_macro_f1_decline_pp: 1.0
+    max_ece_regression: 0.01
+    max_worst_subject_recall_decline_pp: 2.0
+    max_relative_fault_degradation: 0.05
+    max_inference_p95_ms: 250.0
+policy:
+  confidence_threshold: 0.55
+  quality_threshold: 0.35
+  elevated_class: 1
