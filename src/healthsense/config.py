@@ -73,9 +73,9 @@ def validate_config(config: dict[str, Any]) -> None:
     policy = config["policy"]
     run = config["run"]
 
-    for key in ("seed",):
-        if not isinstance(run.get(key), int):
-            raise ValueError(f"run.{key} must be an integer")
+    seed = run.get("seed")
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise ValueError("run.seed must be an integer, not a boolean")
     if not isinstance(run.get("run_id"), str) or not run["run_id"].strip():
         raise ValueError("run.run_id must be a non-empty string")
     if not isinstance(run.get("output_root"), str) or not run["output_root"].strip():
