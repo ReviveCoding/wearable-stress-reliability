@@ -10,7 +10,8 @@ import yaml
 
 from healthsense.utils.io import stable_json_hash
 
-# Configuration validation intentionally exposes ValueError for compatibility.\n_REQUIRED_TOP_LEVEL = {"run", "data", "models", "evaluation", "policy"}
+# Configuration validation intentionally exposes ValueError for compatibility.
+_REQUIRED_TOP_LEVEL = {"run", "data", "models", "evaluation", "policy"}
 
 
 def _finite_float(value: Any, label: str) -> float:
