@@ -10,7 +10,6 @@ import yaml
 
 from healthsense.utils.io import stable_json_hash
 
-
 _REQUIRED_TOP_LEVEL = {"run", "data", "models", "evaluation", "policy"}
 
 

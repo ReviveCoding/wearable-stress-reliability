@@ -66,9 +66,9 @@ def test_explicit_cuda_request_fails_closed_when_cuda_is_unavailable():
 
 
 def test_c3_cached_transforms_match_end_to_end_wrappers() -> None:
+    from healthsense.config import load_config
     from healthsense.evaluation.calibration import TemperatureScaler
     from healthsense.pipeline import _c4_bundle, _c4_from_raw, _c5_bundle, _c5_from_raw
-    from healthsense.config import load_config
 
     batch = make_synthetic_fixture(n_subjects=6, windows_per_subject=12, sequence_length=8)
     scaler = SequenceStandardizer().fit(batch.sequence)

@@ -19,7 +19,7 @@ class MajorityNoAlert:
     n_classes_: int | None = None
     fit_seconds_: float | None = None
 
-    def fit(self, batch: CanonicalBatch) -> "MajorityNoAlert":
+    def fit(self, batch: CanonicalBatch) -> MajorityNoAlert:
         batch.validate()
         if batch.has_unknown_labels:
             raise ValueError("MajorityNoAlert requires reviewed non-negative labels")
@@ -52,7 +52,7 @@ class QualityAwareGBDT:
     n_classes_: int | None = None
     fit_seconds_: float | None = None
 
-    def fit(self, batch: CanonicalBatch) -> "QualityAwareGBDT":
+    def fit(self, batch: CanonicalBatch) -> QualityAwareGBDT:
         batch.validate()
         if batch.has_unknown_labels:
             raise ValueError("QualityAwareGBDT requires reviewed non-negative labels")

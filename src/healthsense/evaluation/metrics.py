@@ -325,7 +325,7 @@ def slice_metrics(
         result, _ = evaluate_predictions(y_true[indices], probabilities[indices], **local_kwargs)
         result["slice_type"] = "subject"
         result["slice_value"] = str(subject)
-        result["n_samples"] = int(len(indices))
+        result["n_samples"] = len(indices)
         rows.append(result)
     return pd.DataFrame(rows)
 

@@ -10,7 +10,7 @@ class SequenceStandardizer:
     mean_: np.ndarray | None = None
     std_: np.ndarray | None = None
 
-    def fit(self, sequence: np.ndarray) -> "SequenceStandardizer":
+    def fit(self, sequence: np.ndarray) -> SequenceStandardizer:
         if sequence.ndim != 3:
             raise ValueError("sequence must be [N,T,C]")
         self.mean_ = sequence.mean(axis=(0, 1), keepdims=True)

@@ -157,7 +157,7 @@ class CanonicalBatch:
             )
         return int(np.max(self.labels) + 1)
 
-    def subset(self, indices: np.ndarray | list[int]) -> "CanonicalBatch":
+    def subset(self, indices: np.ndarray | list[int]) -> CanonicalBatch:
         idx = np.asarray(indices, dtype=int)
         return CanonicalBatch(
             sequence=self.sequence[idx].copy(),

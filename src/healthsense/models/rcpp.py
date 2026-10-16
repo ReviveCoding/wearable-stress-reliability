@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import time
+from dataclasses import dataclass
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
@@ -87,7 +87,7 @@ class RCPPFormer:
         )
         return x.astype(np.float32), expected.astype(np.float32), anchor_support.astype(np.float32)
 
-    def fit(self, batch: CanonicalBatch) -> "RCPPFormer":
+    def fit(self, batch: CanonicalBatch) -> RCPPFormer:
         batch.validate()
         if batch.has_unknown_labels:
             raise ValueError("RCPPFormer requires reviewed non-negative labels")

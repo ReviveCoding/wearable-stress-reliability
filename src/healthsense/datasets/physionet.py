@@ -240,7 +240,7 @@ def prepare_physionet(
     manifest = {
         "dataset": "PhysioNet Wearable Device Dataset from Induced Stress and Structured Exercise Sessions",
         "source_root": str(source.resolve()),
-        "n_windows": int(len(rows)),
+        "n_windows": len(rows),
         "labeled_windows": int(np.sum(np.asarray(labels) >= 0)),
         "unlabeled_windows": int(np.sum(np.asarray(labels) < 0)),
         "tag_map_path": str(tag_map_path) if tag_map_path else None,
