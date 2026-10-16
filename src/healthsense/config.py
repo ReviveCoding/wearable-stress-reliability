@@ -10,7 +10,7 @@ import yaml
 
 from healthsense.utils.io import stable_json_hash
 
-
+# Configuration validation intentionally exposes ValueError for compatibility.
 _REQUIRED_TOP_LEVEL = {"run", "data", "models", "evaluation", "policy"}
 
 
@@ -26,7 +26,7 @@ def _finite_float(value: Any, label: str) -> float:
 
 def _positive_int(value: Any, label: str) -> int:
     if isinstance(value, bool):
-        raise ValueError(f"{label} must be an integer, not boolean")
+        raise ValueError(f"{label} must be an integer, not boolean")  # noqa: TRY004
     parsed = _finite_float(value, label)
     if parsed <= 0 or not parsed.is_integer():
         raise ValueError(f"{label} must be a positive integer")
@@ -35,7 +35,7 @@ def _positive_int(value: Any, label: str) -> int:
 
 def _nonnegative_int(value: Any, label: str) -> int:
     if isinstance(value, bool):
-        raise ValueError(f"{label} must be an integer, not boolean")
+        raise ValueError(f"{label} must be an integer, not boolean")  # noqa: TRY004
     parsed = _finite_float(value, label)
     if parsed < 0 or not parsed.is_integer():
         raise ValueError(f"{label} must be a non-negative integer")
@@ -46,7 +46,7 @@ def _read_yaml(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as handle:
         payload = yaml.safe_load(handle)
     if not isinstance(payload, dict):
-        raise ValueError(f"configuration must decode to a mapping: {path}")
+        raise ValueError(f"configuration must decode to a mapping: {path}")  # noqa: TRY004
     return payload
 
 
@@ -55,7 +55,7 @@ def _default_config() -> tuple[dict[str, Any], str]:
     with resource.open("r", encoding="utf-8") as handle:
         payload = yaml.safe_load(handle)
     if not isinstance(payload, dict):  # pragma: no cover - packaged static resource
-        raise ValueError("packaged default configuration must decode to a mapping")
+        raise ValueError("packaged default configuration must decode to a mapping")  # noqa: TRY004
     return payload, "package://healthsense.resources/smoke.yaml"
 
 
@@ -65,7 +65,7 @@ def validate_config(config: dict[str, Any]) -> None:
         raise ValueError(f"configuration missing required sections: {missing}")
     for section in _REQUIRED_TOP_LEVEL:
         if not isinstance(config[section], dict):
-            raise ValueError(f"configuration section '{section}' must be a mapping")
+            raise ValueError(f"configuration section '{section}' must be a mapping")  # noqa: TRY004
 
     data = config["data"]
     models = config["models"]
@@ -73,15 +73,15 @@ def validate_config(config: dict[str, Any]) -> None:
     policy = config["policy"]
     run = config["run"]
 
-    for key in ("seed",):
-        if not isinstance(run.get(key), int):
-            raise ValueError(f"run.{key} must be an integer")
+    seed = run.get("seed")
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise ValueError("run.seed must be an integer, not a boolean")  # noqa: TRY004
     if not isinstance(run.get("run_id"), str) or not run["run_id"].strip():
         raise ValueError("run.run_id must be a non-empty string")
     if not isinstance(run.get("output_root"), str) or not run["output_root"].strip():
         raise ValueError("run.output_root must be a non-empty string")
     if not isinstance(run.get("deterministic"), bool):
-        raise ValueError("run.deterministic must be a boolean")
+        raise ValueError("run.deterministic must be a boolean")  # noqa: TRY004
     data_ints = {
         key: _positive_int(data.get(key, 0), f"data.{key}")
         for key in (
@@ -139,7 +139,7 @@ def validate_config(config: dict[str, Any]) -> None:
     _positive_int(evaluation.get("bootstrap_resamples", 0), "evaluation.bootstrap_resamples")
     gates = evaluation.get("release_gates")
     if not isinstance(gates, dict):
-        raise ValueError("evaluation.release_gates must be a mapping")
+        raise ValueError("evaluation.release_gates must be a mapping")  # noqa: TRY004
     required_gates = {
         "min_episode_recall_uplift_pp",
         "min_bootstrap_subjects",

@@ -83,7 +83,7 @@ def create_participant_split(
         "policy": "participant_disjoint_deterministic",
         "seed": seed,
         "subjects": roles,
-        "n_samples": {role: int(len(idx)) for role, idx in indices.items()},
+        "n_samples": {role: len(idx) for role, idx in indices.items()},
         "prohibitions": [
             "random window split",
             "test-subject preprocessing fit",
@@ -131,7 +131,7 @@ def load_participant_split(batch: CanonicalBatch, manifest: dict[str, Any]) -> P
         "policy": manifest["policy"],
         "seed": manifest.get("seed"),
         "subjects": {role: sorted(map(str, subjects)) for role, subjects in roles.items()},
-        "n_samples": {role: int(len(idx)) for role, idx in indices.items()},
+        "n_samples": {role: len(idx) for role, idx in indices.items()},
         "prohibitions": manifest.get("prohibitions", []),
     }
     if "fold_id" in manifest:

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import math
 import time
+from dataclasses import dataclass
 
 import numpy as np
 
@@ -13,7 +13,7 @@ from healthsense.utils.seed import set_global_seed
 
 def _torch():
     import torch
-    import torch.nn as nn
+    from torch import nn
 
     return torch, nn
 
@@ -152,7 +152,7 @@ class MaskAwareTemporalEncoder:
             torch.tensor(quality_target, dtype=torch.float32, device=device),
         )
 
-    def fit(self, batch: CanonicalBatch) -> "MaskAwareTemporalEncoder":
+    def fit(self, batch: CanonicalBatch) -> MaskAwareTemporalEncoder:
         batch.validate()
         if batch.has_unknown_labels:
             raise ValueError("MaskAwareTemporalEncoder requires reviewed non-negative labels")

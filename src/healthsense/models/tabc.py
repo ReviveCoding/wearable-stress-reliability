@@ -34,9 +34,16 @@ class TemporalAsymmetricBoundaryCorrection:
                 continue
             left = i - 1
             right = i + 1
-            if left >= 0 and right < n and raw[left] and raw[right] and max_gap >= 1:
-                if support[i] >= min_support and quality[i] >= min_support:
-                    corrected[i] = True
+            if (
+                left >= 0
+                and right < n
+                and raw[left]
+                and raw[right]
+                and max_gap >= 1
+                and support[i] >= min_support
+                and quality[i] >= min_support
+            ):
+                corrected[i] = True
         # Deflate only isolated predictions with insufficient anchor support or data quality.
         for i in range(n):
             left_on = i > 0 and corrected[i - 1]

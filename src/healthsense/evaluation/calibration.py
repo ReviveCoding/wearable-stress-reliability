@@ -16,7 +16,7 @@ def _softmax(logits: np.ndarray) -> np.ndarray:
 class TemperatureScaler:
     temperature_: float = 1.0
 
-    def fit(self, probabilities: np.ndarray, labels: np.ndarray) -> "TemperatureScaler":
+    def fit(self, probabilities: np.ndarray, labels: np.ndarray) -> TemperatureScaler:
         clipped = np.clip(probabilities, 1e-6, 1.0)
         logits = np.log(clipped)
         grid = np.geomspace(0.25, 4.0, 81)

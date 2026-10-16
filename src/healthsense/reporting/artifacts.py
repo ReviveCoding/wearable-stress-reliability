@@ -30,7 +30,7 @@ class ArtifactWriter:
     @classmethod
     def create(
         cls, output_root: str | Path, run_id: str, *, overwrite: bool = False
-    ) -> "ArtifactWriter":
+    ) -> ArtifactWriter:
         safe_run_id = _safe_run_id(run_id)
         output_base = Path(output_root).resolve()
         run_path = output_base / safe_run_id

@@ -49,7 +49,7 @@ def inject_timing_lag(batch: CanonicalBatch, modality: int, lag_ms: float) -> Ca
     out = batch.subset(np.arange(batch.n_samples))
     out.timing_offset_ms[:, modality] += lag_ms
     # deterministic coarse time-shift; strictly within each causal window.
-    shift = max(1, int(round(abs(lag_ms) / 1000.0)))
+    shift = max(1, round(abs(lag_ms) / 1000.0))
     channels = out.channel_modalities == modality
     if lag_ms > 0:
         out.sequence[:, shift:, channels] = out.sequence[:, :-shift, channels]
