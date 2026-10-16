@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from itertools import pairwise
 from typing import Any
 
 import numpy as np
@@ -24,7 +25,7 @@ def adaptive_ece(y_true: np.ndarray, probabilities: np.ndarray, bins: int = 10) 
     if len(boundaries) <= 2:
         return float(abs(conf.mean() - correct.mean()))
     ece = 0.0
-    for lo, hi in zip(boundaries[:-1], boundaries[1:]):
+    for lo, hi in pairwise(boundaries):
         mask = (conf >= lo) & (conf <= hi if hi == boundaries[-1] else conf < hi)
         if mask.any():
             ece += mask.mean() * abs(conf[mask].mean() - correct[mask].mean())
