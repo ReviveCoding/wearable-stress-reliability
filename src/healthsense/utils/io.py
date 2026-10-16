@@ -74,7 +74,7 @@ def write_table(df: pd.DataFrame, path: str | Path) -> Path:
             df.to_parquet(tmp, index=False)
             os.replace(tmp, out)
             return out
-        except Exception:
+        except (ImportError, OSError, TypeError, ValueError):
             tmp.unlink(missing_ok=True)
             out = out.with_suffix(".csv")
     csv = df.to_csv(index=False)
@@ -125,7 +125,7 @@ def hardware_snapshot() -> dict[str, Any]:
                 "cublas_workspace_config": os.environ.get("CUBLAS_WORKSPACE_CONFIG"),
             }
         )
-    except Exception as exc:  # pragma: no cover
+    except Exception as exc:  # noqa: BLE001  # pragma: no cover - optional runtime diagnostic
         snapshot["torch_error"] = repr(exc)
     return snapshot
 
@@ -140,5 +140,5 @@ def git_revision(root: str | Path) -> str | None:
             check=False,
         )
         return result.stdout.strip() or None
-    except Exception:
+    except (OSError, subprocess.SubprocessError):
         return None
