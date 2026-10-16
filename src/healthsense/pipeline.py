@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -168,7 +169,7 @@ def _calibration_table(
     correct = (probs.argmax(axis=1) == y_true).astype(int)
     edges = np.linspace(0, 1, bins + 1)
     rows = []
-    for lo, hi in zip(edges[:-1], edges[1:]):
+    for lo, hi in pairwise(edges):
         mask = (conf >= lo) & (conf <= hi if hi == 1 else conf < hi)
         if mask.any():
             rows.append(
