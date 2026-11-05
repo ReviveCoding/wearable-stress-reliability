@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from healthsense.models.base import PredictionBundle
+from healthsense.temporal import ordered_trace_indices
 
 
 @dataclass
@@ -27,34 +28,24 @@ class TemporalAsymmetricBoundaryCorrection:
     ) -> np.ndarray:
         corrected = raw.copy()
         n = len(raw)
-        # Inflate only small interior gaps supported on both sides. The expansion never crosses a
-        # group boundary because this function receives one ordered trace only.
-        for i in range(n):
-            if raw[i]:
-                continue
-            left = i - 1
-            right = i + 1
-            if (
-                left >= 0
-                and right < n
-                and raw[left]
-                and raw[right]
-                and max_gap >= 1
-                and support[i] >= min_support
-                and quality[i] >= min_support
-            ):
-                corrected[i] = True
-        # Deflate only isolated predictions with insufficient anchor support or data quality.
-        for i in range(n):
-            left_on = i > 0 and corrected[i - 1]
-            right_on = i < n - 1 and corrected[i + 1]
-            if (
-                corrected[i]
-                and not left_on
-                and not right_on
-                and (support[i] < min_support or quality[i] < min_support)
-            ):
-                corrected[i] = False
+        raw_active = raw.astype(bool, copy=False)
+        # Only interior gaps supported by both original neighbors may expand.
+        if n >= 3 and max_gap >= 1:
+            fill_gap = (
+                ~raw_active[1:-1]
+                & raw_active[:-2]
+                & raw_active[2:]
+                & (support[1:-1] >= min_support)
+                & (quality[1:-1] >= min_support)
+            )
+            corrected[1:-1][fill_gap] = True
+        # Removing an isolated positive cannot change another positive's neighbors.
+        has_neighbor = np.zeros(n, dtype=bool)
+        active = corrected.astype(bool, copy=False)
+        has_neighbor[1:] |= active[:-1]
+        has_neighbor[:-1] |= active[1:]
+        low_support = (support < min_support) | (quality < min_support)
+        corrected[active & ~has_neighbor & low_support] = False
         return corrected
 
     def correct(
@@ -86,9 +77,7 @@ class TemporalAsymmetricBoundaryCorrection:
         stress = probs[:, elevated_class].copy()
         corrected = np.zeros(n, dtype=bool)
         raw = stress >= 0.5
-        for group in pd.Series(groups).drop_duplicates().tolist():
-            idx = np.flatnonzero(groups == group)
-            idx = idx[np.argsort(ordering[idx], kind="stable")]
+        for idx in ordered_trace_indices(groups, ordering):
             corrected[idx] = self._correct_trace(
                 raw[idx], support[idx], quality[idx], self.max_extension_windows, self.min_support
             )

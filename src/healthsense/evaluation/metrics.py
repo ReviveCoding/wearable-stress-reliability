@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, log_loss
 
+from healthsense.temporal import ordered_trace_indices
+
 
 def multiclass_brier(y_true: np.ndarray, probabilities: np.ndarray, n_classes: int) -> float:
     one_hot = np.eye(n_classes, dtype=np.float32)[y_true]
@@ -78,12 +80,7 @@ def _ordered_group_indices(
         raise ValueError("time_order must have shape [N]")
     if np.any(~np.isfinite(values)):
         raise ValueError("time_order must be finite")
-    ordered: list[np.ndarray] = []
-    for group in pd.Series(groups).drop_duplicates().tolist():
-        idx = np.flatnonzero(groups == group)
-        local = idx[np.argsort(values[idx], kind="stable")]
-        ordered.append(local)
-    return ordered
+    return ordered_trace_indices(groups, values)
 
 
 def episode_metrics(
