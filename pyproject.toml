@@ -49,6 +49,13 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = "-q --strict-config --strict-markers"
 junit_suite_name = "healthsense-rcp"
+markers = [
+  "gpu: requires a GPU runtime",
+  "cuda: requires a CUDA runtime",
+  "wesad: requires the external WESAD dataset",
+  "slow: extended runtime test",
+  "integration: integration validation",
+]
 
 [tool.coverage.run]
 branch = true

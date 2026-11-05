@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, log_loss
 
+from healthsense.temporal import ordered_trace_indices
+
 
 def multiclass_brier(y_true: np.ndarray, probabilities: np.ndarray, n_classes: int) -> float:
     one_hot = np.eye(n_classes, dtype=np.float32)[y_true]
@@ -36,10 +38,10 @@ def risk_coverage_auc(y_true: np.ndarray, probabilities: np.ndarray) -> float:
     confidence = probabilities.max(axis=1)
     correctness = (probabilities.argmax(axis=1) == y_true).astype(float)
     order = np.argsort(-confidence, kind="stable")
-    risks = []
-    for k in range(1, len(order) + 1):
-        risks.append(1.0 - correctness[order[:k]].mean())
-    coverage = np.arange(1, len(order) + 1) / len(order)
+    retained_counts = np.arange(1, len(order) + 1)
+    # Correctness is binary, so prefix sums preserve the exact prefix means.
+    risks = 1.0 - np.cumsum(correctness[order]) / retained_counts
+    coverage = retained_counts / len(order)
     return float(np.trapezoid(risks, coverage))
 
 
@@ -78,12 +80,7 @@ def _ordered_group_indices(
         raise ValueError("time_order must have shape [N]")
     if np.any(~np.isfinite(values)):
         raise ValueError("time_order must be finite")
-    ordered: list[np.ndarray] = []
-    for group in pd.Series(groups).drop_duplicates().tolist():
-        idx = np.flatnonzero(groups == group)
-        local = idx[np.argsort(values[idx], kind="stable")]
-        ordered.append(local)
-    return ordered
+    return ordered_trace_indices(groups, values)
 
 
 def episode_metrics(
