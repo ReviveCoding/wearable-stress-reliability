@@ -36,10 +36,10 @@ def risk_coverage_auc(y_true: np.ndarray, probabilities: np.ndarray) -> float:
     confidence = probabilities.max(axis=1)
     correctness = (probabilities.argmax(axis=1) == y_true).astype(float)
     order = np.argsort(-confidence, kind="stable")
-    risks = []
-    for k in range(1, len(order) + 1):
-        risks.append(1.0 - correctness[order[:k]].mean())
-    coverage = np.arange(1, len(order) + 1) / len(order)
+    retained_counts = np.arange(1, len(order) + 1)
+    # Correctness is binary, so prefix sums preserve the exact prefix means.
+    risks = 1.0 - np.cumsum(correctness[order]) / retained_counts
+    coverage = retained_counts / len(order)
     return float(np.trapezoid(risks, coverage))
 
 
